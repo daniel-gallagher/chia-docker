@@ -24,15 +24,13 @@ RUN apt-get update ; \
     apt-get install -qy curl jq python3 ansible tar bash ca-certificates git openssl unzip wget python3-pip sudo acl build-essential python3.9 python3.9-dev python3.9-venv python3.9-distutils apt nfs-common python-is-python3 nano bc ; \
     rm -rf /var/lib/apt/lists/*
 
-RUN echo "Cloning ${branch} branch"
-RUN git clone https://github.com/Chia-Network/chia-blockchain.git -b latest --recurse-submodules ; \
-    cd chia-blockchain ; \
-    chmod +x install.sh ; \
-    /usr/bin/sh ./install.sh
+RUN git clone https://github.com/Chia-Network/chia-blockchain.git -b latest --recurse-submodules
 
 WORKDIR /chia-blockchain
 
 COPY scripts/chia_update.sh /usr/local/bin/chia_update.sh
+
+RUN /usr/bin/sh ./install.sh
 RUN chmod +x /usr/local/bin/chia_update.sh
 RUN mkdir /plots
 ADD ./entrypoint.sh entrypoint.sh
