@@ -41,7 +41,7 @@ init_keys () {
 }
 
 init_plots () {
-    chia plots add -d ${plots_final_dir}
+    chia plots add -d ${plots_dir}
 }
 
 case ${chia_service} in
