@@ -3,27 +3,31 @@ FROM ubuntu:latest
 EXPOSE 8555
 EXPOSE 8444
 
+ENV chia_service="farmer"
+ENV chia_update_on_init="true"
+ENV chia_dir="/chia-blockchain"
 ENV keys="generate"
 ENV harvester="false"
 ENV farmer="false"
 ENV plots_dir="/plots"
-ENV farmer_address="null"
-ENV farmer_port="null"
+ENV farmer_address="localhost"
+ENV farmer_port=8447
+ENV full_node_port=8444
 ENV testnet="false"
-ENV full_node_port="null"
+ENV PATH=/chia-blockchain/venv/bin/:$PATH
 ARG BRANCH
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y curl jq python3 ansible tar bash ca-certificates git openssl unzip wget python3-pip sudo acl build-essential python3-dev python3.8-venv python3.8-distutils apt nfs-common python-is-python3 vim tzdata
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
+    curl jq python3 ansible tar bash ca-certificates git openssl unzip wget python3-pip sudo acl build-essential python3.9 python3.9-dev python3.9-venv python3.9-distutils apt nfs-common python-is-python3 nano tzdata
 
 RUN echo "cloning ${BRANCH}"
-RUN git clone --branch ${BRANCH} https://github.com/Chia-Network/chia-blockchain.git \
-&& cd chia-blockchain \
-&& git submodule update --init mozilla-ca \
-&& chmod +x install.sh \
-&& /usr/bin/sh ./install.sh
+RUN git clone https://github.com/Chia-Network/chia-blockchain.git -b ${BRANCH} --recurse-submodules
+RUN cd chia-blockchain && /usr/bin/sh ./install.sh
 
-ENV PATH=/chia-blockchain/venv/bin/:$PATH
 WORKDIR /chia-blockchain
+
+COPY scripts/chia_update.sh /usr/local/bin/chia_update.sh
+RUN chmod +x /usr/local/bin/chia_update.sh
 RUN mkdir /plots
 ADD ./entrypoint.sh entrypoint.sh
 
