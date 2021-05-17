@@ -25,12 +25,12 @@ RUN apt-get update ; \
     rm -rf /var/lib/apt/lists/*
 
 RUN echo "Cloning ${branch} branch"
-RUN git clone https://github.com/Chia-Network/chia-blockchain.git -b latest --recurse-submodules
+RUN git clone https://github.com/Chia-Network/chia-blockchain.git -b latest --recurse-submodules ; \
+    cd chia-blockchain ; \
+    chmod +x install.sh ; \
+    /usr/bin/sh ./install.sh
 
 WORKDIR /chia-blockchain
-
-RUN chmod +x /chia-blockchain/install.sh
-RUN sh ./install.sh
 
 COPY scripts/chia_update.sh /usr/local/bin/chia_update.sh
 RUN chmod +x /usr/local/bin/chia_update.sh
