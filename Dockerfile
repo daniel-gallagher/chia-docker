@@ -15,6 +15,8 @@ ENV farmer_port=8447
 ENV full_node_port=8444
 ENV testnet="false"
 ENV PATH=/chia-blockchain/venv/bin/:$PATH
+
+#Keeping this way for use in TrueNAS Helm chart
 ARG BRANCH
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
