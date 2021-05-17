@@ -21,7 +21,7 @@ ENV branch="latest"
 ARG branch_arg
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
-    curl jq python3 ansible tar bash ca-certificates git openssl unzip wget python3-pip sudo acl build-essential python3.9 python3.9-dev python3.9-venv python3.9-distutils apt nfs-common python-is-python3 nano tzdata
+    curl jq python3 ansible tar bash ca-certificates git openssl unzip wget python3-pip sudo acl build-essential python3.9 python3.9-dev python3.9-venv python3.9-distutils apt nfs-common python-is-python3 nano
 
 RUN echo "cloning ${branch}"
 RUN git clone https://github.com/Chia-Network/chia-blockchain.git -b ${branch} --recurse-submodules
