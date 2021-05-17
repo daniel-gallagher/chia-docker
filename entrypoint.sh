@@ -1,44 +1,60 @@
-cd /chia-blockchain
+#!/usr/bin/env bash
 
-. ./activate
+init_chia () {
+    if [[ ${chia_update_on_init} == "true" ]]; then
+        chia_update.sh
+    fi
 
-chia init
+    cd ${chia_dir}
+    . ./activate
+    chia init
 
-if [[ ${keys} == "generate" ]]; then
-  echo "to use your own keys pass them as a text file -v /path/to/keyfile:/path/in/container and -e keys=\"/path/in/container\""
-  chia keys generate
-else
-  chia keys add -f ${keys}
-fi
+    sed -i 's/localhost/127.0.0.1/g' ~/.chia/mainnet/config/config.yaml
+}
 
-if [[ ! "$(ls -A /plots)" ]]; then
-  echo "Plots directory appears to be empty and you have not specified another, try mounting a plot directory with the docker -v command "
-fi
+init_network () {
+    if [[ ${chia_service} == 'harvester' ]]; then
+        if [[ -z ${farmer_address} || -z ${farmer_port} ]]; then
+            echo "A farmer_address and farmer_port are required to start a harvester."
+            exit
+        else
+            chia configure --set-farmer-peer ${farmer_address}:${farmer_port}
+        fi
+    fi
 
-chia plots add -d ${plots_dir}
+    if [[ ${testnet} == "true" ]]; then
+        if [[ -z $full_node_port || $full_node_port == "null" ]]; then
+            chia configure --set-fullnode-port 58444
+        else
+            chia configure --set-fullnode-port ${full_node_port}
+        fi
+    fi
+}
 
-sed -i 's/localhost/127.0.0.1/g' ~/.chia/mainnet/config/config.yaml
+init_keys () {
+    if [[ ${keys} == "generate" ]]; then
+        echo "To use your own keys pass them as a text file. Generating keys now."
+        chia keys generate
+    else
+        chia keys add -f ${keys}
+    fi
+}
 
-if [[ ${farmer} == 'true' ]]; then
-  chia start farmer-only
-elif [[ ${harvester} == 'true' ]]; then
-  if [[ -z ${farmer_address} || -z ${farmer_port} ]]; then
-    echo "A farmer peer address and port are required."
-    exit
-  else
-    chia configure --set-farmer-peer ${farmer_address}:${farmer_port}
-    chia start harvester
-  fi
-else
-  chia start farmer
-fi
+init_plots () {
+    chia plots add -d ${plots_final_dir}
+}
 
-if [[ ${testnet} == "true" ]]; then
-  if [[ -z $full_node_port || $full_node_port == "null" ]]; then
-    chia configure --set-fullnode-port 58444
-  else
-    chia configure --set-fullnode-port ${var.full_node_port}
-  fi
-fi
+case ${chia_service} in
+    null|none|plotter)
+        init_chia
+    ;;
+    *)
+        init_chia
+        init_network
+        init_keys
+        init_plots
+        chia start ${chia_service}
+    ;;
+esac
 
 while true; do sleep 30; done;
