@@ -20,8 +20,8 @@ ENV branch="latest"
 #Keeping this way for use in TrueNAS Helm chart
 ARG branch_arg
 
-RUN apt-get update ; \
-    apt-get install -qy curl jq python3 ansible tar bash ca-certificates git openssl unzip wget python3-pip sudo acl build-essential python3.9 python3.9-dev python3.9-venv python3.9-distutils apt nfs-common python-is-python3 nano bc ; \
+RUN apt update ; \
+    apt install -qy curl jq python3 ansible tar bash ca-certificates git openssl unzip wget python3-pip sudo acl build-essential python3.9 python3.9-dev python3.9-venv python3.9-distutils apt nfs-common python-is-python3 nano bc apt-utils ; \
     rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/Chia-Network/chia-blockchain.git -b latest --recurse-submodules
