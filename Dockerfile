@@ -29,7 +29,8 @@ RUN git clone https://github.com/Chia-Network/chia-blockchain.git -b latest --re
 
 WORKDIR /chia-blockchain
 
-RUN ${chia_dir}/install.sh
+RUN chmod +x ${chia_dir}/install.sh ;\
+    ${chia_dir}/install.sh
 
 COPY scripts/chia_update.sh /usr/local/bin/chia_update.sh
 RUN chmod +x /usr/local/bin/chia_update.sh
